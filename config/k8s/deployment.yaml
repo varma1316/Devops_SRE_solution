@@ -92,7 +92,7 @@ spec:
     spec:
       containers:
       - name: memory-hog-container
-        image: ghcr.io/varma1316/devops_sre_solution:3.11-7f1f8ac024a0b3e533e4e5ef32e46a24be73166f
+        image: ghcr.io/varma1316/devops_sre_solution:3.11-617a957368f2531bfcb84548feea6f0f9eb8890f
         imagePullPolicy: Always
         resources:
           requests:
