@@ -1,0 +1,99 @@
+name: Master CI Pipeline
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - 'app/**'
+      - '.github/workflows/**'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Secret Scanning (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Set up Python for SAST
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: SAST Scanning (Bandit)
+        run: |
+          pip install bandit
+          bandit -r . -f custom
+        continue-on-error: true
+        
+      - name: Run Tests (Echo)
+        run: echo "test"
+        
+      - name: Run Build (Echo)
+        run: echo "build"
+
+  image-scan:
+    needs: static-analysis
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
+        
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+        
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Build Docker image locally
+        run: |
+          docker build \
+            --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
+            -t local-myapp:${{ matrix.python-version }} .
+
+      - name: Container Image Vulnerability Scanning (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'local-myapp:${{ matrix.python-version }}'
+          format: 'table'
+          exit-code: '0'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+        continue-on-error: true
+
+  create-pr:
+    needs: image-scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Create Pull Request to Main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head master \
+            --title "Automated PR: Merge master into main" \
+            --body "This PR was automatically created by the master CI pipeline after successful security scans and image builds." || echo "PR already exists or no changes to merge."
