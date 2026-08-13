@@ -29,6 +29,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ADMIN_PAT }}
+          fetch-depth: 0
         
       - name: Run Tests (Echo)
         run: echo "test"
@@ -54,29 +57,34 @@ jobs:
           IMAGE_ID=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[A-Z]' '[a-z]')
           
           docker tag local-myapp:${{ matrix.python-version }} $IMAGE_ID:${{ matrix.python-version }}-${{ github.sha }}
-          
-
           docker push $IMAGE_ID:${{ matrix.python-version }}-${{ github.sha }}
 
       - name: Update GitOps Deployment Manifest
         run: |
           IMAGE_ID=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[A-Z]' '[a-z]')
           NEW_IMAGE="${IMAGE_ID}:${{ matrix.python-version }}-${{ github.sha }}"
+          MANIFEST_PATH="../config/k8s/deployment.yaml"
           
           # Update the specific image tag for this Python version
-          sed -i "s|image: .*:${{ matrix.python-version }}-.*|image: $NEW_IMAGE|g" ../config/k8s/deployment.yaml
+          sed -i "s|image: .*:${{ matrix.python-version }}-.*|image: $NEW_IMAGE|g" "$MANIFEST_PATH"
           
-          cd .. # go back to root of repo to run git commands
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
-          git add config/k8s/deployment.yaml
-          git commit -m "chore(cd): update image tag for ${{ matrix.python-version }} to ${{ github.sha }} [skip ci]" || echo "No changes to commit"
+          git add "$MANIFEST_PATH"
           
-          # Pull with rebase to minimize race conditions, then push (with retry)
-          n=0
-          until [ "$n" -ge 5 ]
-          do
-             git pull --rebase origin main && git push origin main && break
-             n=$((n+1)) 
-             sleep 5
-          done
+          # Only commit and push if changes were detected
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(cd): update image tag for ${{ matrix.python-version }} to ${{ github.sha }} [skip ci]"
+            
+            # Pull with rebase to handle parallel matrix pushes, then push (with retry)
+            n=0
+            until [ "$n" -ge 5 ]
+            do
+               git pull --rebase origin main && git push origin main && break
+               n=$((n+1))
+               git rebase --abort 2>/dev/null || true
+               sleep 5
+            done
+          else
+            echo "No changes detected in deployment.yaml"
+          fi
