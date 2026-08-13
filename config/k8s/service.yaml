@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: memory-hog-service
+  namespace: memory-hog-ns
+  labels:
+    app: memory-hog
+spec:
+  selector:
+    app: memory-hog # This shared label allows the Service to load balance traffic across all 3 deployments
+  ports:
+    - name: web
+      protocol: TCP
+      port: 80
+      targetPort: 8080
