@@ -118,7 +118,7 @@ spec:
         command: ['sh', '-c', 'echo "Simulating dependency check for 5 seconds..."; sleep 5; echo "Dependencies are up!"']
       containers:
       - name: memory-hog-container
-        image: ghcr.io/varma1316/devops_sre_solution:3.11-1c3c2f26c9094d3515d02d82837ca9adb5cdf729
+        image: ghcr.io/varma1316/devops_sre_solution:3.11-63925f1d7491564252aecfb5401829dfa1b469fe
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
