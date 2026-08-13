@@ -21,14 +21,14 @@ The application code is provided in the repository. Your first task is to contai
    - Create an **optimal** `Dockerfile` for the provided Python application.
    - Keep the image size as small as possible while ensuring the application runs correctly.
    - Follow container security best practices (e.g., use a minimal base image, run as a non-root user).
-2. **Secure CI/CD Pipeline (GitHub Actions or similar):**
-   - Create a pipeline that builds the Docker image.
-   - Design the pipeline so that it concurrently builds and tests the image against multiple different versions of the base runtime environment dynamically, without manually duplicating the pipeline jobs.
-   - Integrate security scanning tools into the pipeline:
-     - **Secret Scanning** (e.g., Gitleaks) *(Optional)*
-     - **SAST** (Static Application Security Testing)
-     - **Container Image Vulnerability Scanning** (e.g., Trivy or Grype)
-   - If the image passes all security checks, push it to a container registry (e.g., Docker Hub, GHCR).
+2. **Multi-Branch Secure CI/CD Architecture (GitHub Actions or similar):**
+   - **Branch Protection:** Enforce a policy where direct commits to the `main` branch are restricted. All changes must go through a Pull Request.
+   - **Working Branch Pipeline:** Create a pipeline triggered by commits on your working branch (e.g., `master`).
+     - It should concurrently build and test the image against multiple different Python versions using a dynamic matrix.
+     - Integrate code quality and security scanning tools: **Code Linting** (e.g., Flake8), **Secret Scanning** (Optional), **SAST** (Static Application Security Testing), and **Container Image Vulnerability Scanning**.
+     - If all tests and scans pass successfully, the pipeline should automatically create a Pull Request to the `main` branch.
+   - **Release Pipeline (`main` branch):** Create a second pipeline that only triggers when a PR is merged into `main`.
+     - This pipeline should build the final images, push them to a container registry (e.g., Docker Hub, GHCR), and automatically update the image tags in the Kubernetes deployment manifests in your repository.
 
 ---
 
@@ -45,6 +45,9 @@ We use GitOps to manage our Kubernetes clusters. You need to automate the deploy
 3. **Automated Deployment & Image Updates:**
    - Configure ArgoCD to track your repository and automatically deploy/sync the application.
    - You may choose **any method** to automate the updating of the image tag in your deployment environment. For example, you could configure your CI/CD pipeline to automatically commit and push the new image tag back to your Git configuration files after a successful build.
+4. **Enterprise Best Practices & Innovation:**
+   - Instead of just a basic deployment, design and implement a production-grade Kubernetes footprint using your own innovation. 
+   - You must implement at least the following, but you have full creative freedom on how to securely configure them: **Namespaces**, **ConfigMaps & Secrets**, **initContainers**, **RBAC** (ServiceAccounts, Roles), **NetworkPolicies**, and **ResourceQuotas**.
 
 ---
 
@@ -52,11 +55,12 @@ We use GitOps to manage our Kubernetes clusters. You need to automate the deploy
 
 Visibility into the cluster and the application's behavior is critical.
 
-1. **Metrics & Dashboards:**
-   - Install **Prometheus** and **Grafana** in your cluster(via Helm).
-   - Build a comprehensive Grafana Dashboard that displays(You Can also import them):
+1. **Comprehensive Observability Stack:**
+   - Install **Prometheus** and **Grafana** in your cluster(via Helm) for metrics monitoring.
+   - Build a comprehensive Grafana Dashboard that displays (You Can also import them):
      - **Node Metrics:** CPU, Memory, and Disk usage.
      - **Pod & Cluster Metrics:** CPU and Memory usage per pod.
+   - **Log Aggregation / Tracing:** Since Prometheus only handles metrics, you must implement an additional observability stack of your choice (e.g., ELK/EFK stack, Loki, or similar) to capture and aggregate the application logs centrally.
 2. **Alerting:**
    - Configure **Grafana Alerts** to trigger notifications for the following scenarios:
      - **Application Health Check Failures** (Pod goes down or becomes unready).
