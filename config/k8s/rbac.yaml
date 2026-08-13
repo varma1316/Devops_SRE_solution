@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: memory-hog-sa
+  namespace: memory-hog-ns
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: memory-hog-role
+  namespace: memory-hog-ns
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"] # Least privilege: just allowing it to read pod info if it needed to
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: memory-hog-rolebinding
+  namespace: memory-hog-ns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: memory-hog-role
+subjects:
+- kind: ServiceAccount
+  name: memory-hog-sa
+  namespace: memory-hog-ns

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: memory-hog-config
+  namespace: memory-hog-ns
+data:
+  APP_ENV: "production"
+  LOG_LEVEL: "INFO"
