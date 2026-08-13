@@ -11,7 +11,7 @@ spec:
     path: ./config/k8s # The path where the deployment.yaml is stored
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: default
+    namespace: memory-hog-ns
   syncPolicy:
     automated:
       prune: true
