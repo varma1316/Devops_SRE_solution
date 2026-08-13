@@ -1,5 +1,6 @@
 name: Master CI Pipeline
 
+
 on:
   push:
     branches: [ "master" ]
