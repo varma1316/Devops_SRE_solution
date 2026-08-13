@@ -5,8 +5,8 @@ metadata:
   namespace: memory-hog-ns
 spec:
   hard:
-    pods: "10"
+    pods: "4"
     requests.cpu: "1"
     requests.memory: "1Gi"
-    limits.cpu: "2"
+    limits.cpu: "3"
     limits.memory: "2Gi"
