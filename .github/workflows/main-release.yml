@@ -53,10 +53,9 @@ jobs:
         run: |
           IMAGE_ID=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[A-Z]' '[a-z]')
           
-          docker tag local-myapp:${{ matrix.python-version }} $IMAGE_ID:${{ matrix.python-version }}
           docker tag local-myapp:${{ matrix.python-version }} $IMAGE_ID:${{ matrix.python-version }}-${{ github.sha }}
           
-          docker push $IMAGE_ID:${{ matrix.python-version }}
+
           docker push $IMAGE_ID:${{ matrix.python-version }}-${{ github.sha }}
 
       - name: Update GitOps Deployment Manifest
@@ -65,12 +64,12 @@ jobs:
           NEW_IMAGE="${IMAGE_ID}:${{ matrix.python-version }}-${{ github.sha }}"
           
           # Update the specific image tag for this Python version
-          sed -i "s|image: .*:${{ matrix.python-version }}-.*|image: $NEW_IMAGE|g" ../k8s/deployment.yaml
+          sed -i "s|image: .*:${{ matrix.python-version }}-.*|image: $NEW_IMAGE|g" ../config/k8s/deployment.yaml
           
           cd .. # go back to root of repo to run git commands
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
-          git add k8s/deployment.yaml
+          git add config/k8s/deployment.yaml
           git commit -m "chore(cd): update image tag for ${{ matrix.python-version }} to ${{ github.sha }} [skip ci]" || echo "No changes to commit"
           
           # Pull with rebase to minimize race conditions, then push (with retry)
