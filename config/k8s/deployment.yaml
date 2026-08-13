@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: memory-hog-app-3-9
+  namespace: memory-hog-ns
   labels:
     app: memory-hog
 spec:
@@ -16,10 +17,20 @@ spec:
         app: memory-hog
         version: "3.9"
     spec:
+      serviceAccountName: memory-hog-sa
+      initContainers:
+      - name: init-dependency-check
+        image: busybox:1.36
+        command: ['sh', '-c', 'echo "Simulating dependency check for 5 seconds..."; sleep 5; echo "Dependencies are up!"']
       containers:
       - name: memory-hog-container
         image: ghcr.io/varma1316/devops_sre_solution:3.9-7f1f8ac024a0b3e533e4e5ef32e46a24be73166f
         imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: memory-hog-config
+        - secretRef:
+            name: memory-hog-secret
         resources:
           requests:
             memory: "100Mi"
@@ -28,10 +39,9 @@ spec:
             memory: "400Mi"
             cpu: "500m"
         livenessProbe:
-          exec:
-            command:
-            - ps
-            - aux
+          httpGet:
+            path: /healthcheck
+            port: 8080
           initialDelaySeconds: 10
           periodSeconds: 15
 ---
@@ -39,6 +49,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: memory-hog-app-3-10
+  namespace: memory-hog-ns
   labels:
     app: memory-hog
 spec:
@@ -53,10 +64,20 @@ spec:
         app: memory-hog
         version: "3.10"
     spec:
+      serviceAccountName: memory-hog-sa
+      initContainers:
+      - name: init-dependency-check
+        image: busybox:1.36
+        command: ['sh', '-c', 'echo "Simulating dependency check for 5 seconds..."; sleep 5; echo "Dependencies are up!"']
       containers:
       - name: memory-hog-container
         image: ghcr.io/varma1316/devops_sre_solution:3.10-7f1f8ac024a0b3e533e4e5ef32e46a24be73166f
         imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: memory-hog-config
+        - secretRef:
+            name: memory-hog-secret
         resources:
           requests:
             memory: "100Mi"
@@ -65,10 +86,9 @@ spec:
             memory: "400Mi"
             cpu: "500m"
         livenessProbe:
-          exec:
-            command:
-            - ps
-            - aux
+          httpGet:
+            path: /healthcheck
+            port: 8080
           initialDelaySeconds: 10
           periodSeconds: 15
 ---
@@ -76,6 +96,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: memory-hog-app-3-11
+  namespace: memory-hog-ns
   labels:
     app: memory-hog
 spec:
@@ -90,10 +111,20 @@ spec:
         app: memory-hog
         version: "3.11"
     spec:
+      serviceAccountName: memory-hog-sa
+      initContainers:
+      - name: init-dependency-check
+        image: busybox:1.36
+        command: ['sh', '-c', 'echo "Simulating dependency check for 5 seconds..."; sleep 5; echo "Dependencies are up!"']
       containers:
       - name: memory-hog-container
         image: ghcr.io/varma1316/devops_sre_solution:3.11-7f1f8ac024a0b3e533e4e5ef32e46a24be73166f
         imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: memory-hog-config
+        - secretRef:
+            name: memory-hog-secret
         resources:
           requests:
             memory: "100Mi"
@@ -102,9 +133,8 @@ spec:
             memory: "400Mi"
             cpu: "500m"
         livenessProbe:
-          exec:
-            command:
-            - ps
-            - aux
+          httpGet:
+            path: /healthcheck
+            port: 8080
           initialDelaySeconds: 10
           periodSeconds: 15
