@@ -23,16 +23,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Python for Linting & SAST
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Code Formatting Check (Black)
+        run: |
+          pip install black
+          black --check .
+        continue-on-error: true
+
       - name: Secret Scanning (Gitleaks)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
-
-      - name: Set up Python for SAST
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
 
       - name: SAST Scanning (Bandit)
         run: |
