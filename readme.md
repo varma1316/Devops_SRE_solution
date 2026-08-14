@@ -23,10 +23,10 @@ The application code is provided in the repository. Your first task is to contai
    - Follow container security best practices (e.g., use a minimal base image, run as a non-root user).
 2. **Multi-Branch Secure CI/CD Architecture (GitHub Actions or similar):**
    - **Branch Protection:** Enforce a policy where direct commits to the `main` branch are restricted. All changes must go through a Pull Request.
-   - **Working Branch Pipeline:** Create a pipeline triggered by commits on your working branch (e.g., `master`).
-     - It should concurrently build and test the image against multiple different Python versions using a dynamic matrix.
+   - **Working Branch Pipeline:** Create a pipeline that is triggered only when a Pull Request is opened against the main branch.
+     - It should build and test the image.
      - Integrate code quality and security scanning tools: **Code Linting** (e.g., Flake8), **Secret Scanning** (Optional), **SAST** (Static Application Security Testing), and **Container Image Vulnerability Scanning**.
-     - If all tests and scans pass successfully, the pipeline should automatically create a Pull Request to the `main` branch.
+     - All tests, linting, and security scans must pass successfully before the Pull Request can be merged into main branch.
    - **Release Pipeline (`main` branch):** Create a second pipeline that only triggers when a PR is merged into `main`.
      - This pipeline should build the final images, push them to a container registry (e.g., Docker Hub, GHCR), and automatically update the image tags in the Kubernetes deployment manifests in your repository.
 
