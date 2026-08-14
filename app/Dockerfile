@@ -18,3 +18,7 @@ USER appuser
 
 # Run the memory-hog application
 CMD ["python", "app.py"]
+
+
+
+

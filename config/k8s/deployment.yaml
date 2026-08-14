@@ -22,6 +22,13 @@ spec:
       - name: init-dependency-check
         image: busybox:1.36
         command: ['sh', '-c', 'echo "Simulating dependency check for 5 seconds..."; sleep 5; echo "Dependencies are up!"']
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "50m"
+          limits:
+            memory: "100Mi"
+            cpu: "100m"
       containers:
       - name: memory-hog-container
         image: ghcr.io/varma1316/devops_sre_solution:3.9-63925f1d7491564252aecfb5401829dfa1b469fe
@@ -69,6 +76,13 @@ spec:
       - name: init-dependency-check
         image: busybox:1.36
         command: ['sh', '-c', 'echo "Simulating dependency check for 5 seconds..."; sleep 5; echo "Dependencies are up!"']
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "50m"
+          limits:
+            memory: "100Mi"
+            cpu: "100m"
       containers:
       - name: memory-hog-container
         image: ghcr.io/varma1316/devops_sre_solution:3.10-63925f1d7491564252aecfb5401829dfa1b469fe
@@ -116,6 +130,13 @@ spec:
       - name: init-dependency-check
         image: busybox:1.36
         command: ['sh', '-c', 'echo "Simulating dependency check for 5 seconds..."; sleep 5; echo "Dependencies are up!"']
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "50m"
+          limits:
+            memory: "100Mi"
+            cpu: "100m"
       containers:
       - name: memory-hog-container
         image: ghcr.io/varma1316/devops_sre_solution:3.11-63925f1d7491564252aecfb5401829dfa1b469fe

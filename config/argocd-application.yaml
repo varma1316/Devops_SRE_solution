@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/varma1316/Devops_SRE_solution.git' # e.g., https://github.com/username/project_devops.git
-    targetRevision: HEAD
+    targetRevision: main
     path: ./config/k8s # The path where the deployment.yaml is stored
   destination:
     server: 'https://kubernetes.default.svc'
