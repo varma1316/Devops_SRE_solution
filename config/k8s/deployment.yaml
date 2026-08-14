@@ -139,7 +139,7 @@ spec:
             cpu: "100m"
       containers:
       - name: memory-hog-container
-        image: ghcr.io/varma1316/devops_sre_solution:3.11-f162556437e676565a7e2756b4d706b7754f31ca
+        image: ghcr.io/varma1316/devops_sre_solution:3.11-233de8b2a7ac5a6092aefffcf8c61b6957b73f97
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
