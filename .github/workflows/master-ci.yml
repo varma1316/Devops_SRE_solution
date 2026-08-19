@@ -44,10 +44,13 @@ jobs:
         run: |
           pip install bandit
           bandit -r . -f custom
-        continue-on-error: true
+
         
-      - name: Run Tests (Echo)
-        run: echo "test"
+      - name: Run Unit Tests (Pytest)
+        run: |
+          pip install pytest
+          pytest test_cases.py -v
+
         
       - name: Run Build (Echo)
         run: echo "build"
@@ -81,4 +84,3 @@ jobs:
           exit-code: '0'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-        continue-on-error: true
