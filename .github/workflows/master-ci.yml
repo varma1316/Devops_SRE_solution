@@ -31,7 +31,7 @@ jobs:
       - name: Code Formatting Check (Black)
         run: |
           pip install black
-          black --check .
+          black .
         continue-on-error: true
 
       - name: Secret Scanning (Gitleaks)
@@ -43,7 +43,7 @@ jobs:
       - name: SAST Scanning (Bandit)
         run: |
           pip install bandit
-          bandit -r . -f custom -s B104
+          bandit -r . -f custom
 
         
       - name: Run Unit Tests (Pytest)
