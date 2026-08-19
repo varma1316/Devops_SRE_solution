@@ -7,12 +7,16 @@ import sys
 from http.server import HTTPServer
 
 
+# current_dir is the 'test/' directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# Look for app.py in the parent directory (if we are in test/), otherwise current directory
-app_path = os.path.abspath(os.path.join(current_dir, "..", "app.py"))
-if not os.path.exists(app_path):
-    app_path = os.path.abspath(os.path.join(current_dir, "app.py"))
 
+# Go up one level, then into 'app', and target 'app.py'
+app_path = os.path.abspath(os.path.join(current_dir, "..", "app", "app.py"))
+
+if not os.path.exists(app_path):
+    raise FileNotFoundError(f"Could not find app.py at {app_path}")
+
+# Load the file explicitly bypassing any folder naming conflicts
 spec = importlib.util.spec_from_file_location("app_module", app_path)
 app = importlib.util.module_from_spec(spec)
 sys.modules["app_module"] = app
@@ -23,6 +27,9 @@ HealthCheckHandler = app.HealthCheckHandler
 run_server = app.run_server
 
 
+# ──────────────────────────────────────────────
+# Test Server Fixture
+# ──────────────────────────────────────────────
 @pytest.fixture(scope="module")
 def test_server():
     """Start the app's HTTP server on a random free port for the test session."""
@@ -37,7 +44,9 @@ def test_server():
     server.shutdown()
 
 
-
+# ──────────────────────────────────────────────
+# Tests
+# ──────────────────────────────────────────────
 def test_healthcheck_status_200(test_server):
     port = test_server
     url = f"http://127.0.0.1:{port}/healthcheck"
