@@ -33,8 +33,6 @@ jobs:
           token: ${{ secrets.ADMIN_PAT }}
           fetch-depth: 0
         
-      - name: Run Tests (Echo)
-        run: echo "test"
         
       - name: Run Build (Echo)
         run: echo "build"
