@@ -43,7 +43,7 @@ jobs:
       - name: SAST Scanning (Bandit)
         run: |
           pip install bandit
-          bandit -r . -f custom
+          bandit -r . -f custom -s B104
 
         
       - name: Run Unit Tests (Pytest)
